@@ -1,11 +1,7 @@
 import json
 import time
 
-from eth_keys import keys
 from web3 import Web3, HTTPProvider
-from web3._utils.encoding import (
-    to_hex
-)
 
 address = "0x2c7536e3605d9c16a7a3d7b1898e529396a65c23"
 
@@ -77,7 +73,7 @@ def get_privatekey():
 
 
 if __name__ == "__main__":
-    FULL_NODE_HOSTS = 'http://192.168.1.126:8089'
+    FULL_NODE_HOSTS = 'http://thinkey.natapp1.cc/http2rpc'
     provider = HTTPProvider(FULL_NODE_HOSTS)
     web3 = Web3(provider)
 
