@@ -11,8 +11,8 @@ address = "0x2c7536e3605d9c16a7a3d7b1898e529396a65c23"
 
 
 def Transfer():
-    '''转账'''
-    accountInfo = web3.thk.getAccount(address)
+    """转账"""
+    account_info = web3.thk.getAccount(address)
     con_tx = {
         "chainId": "2",
         "from": address,
@@ -21,8 +21,8 @@ def Transfer():
         "input": '',
         "value": "1111111110"
     }
-    privartekey = get_privatekey()
-    con_sign_tx = web3.thk.signTransaction(con_tx, privartekey)
+    privarte_key = get_privatekey()
+    con_sign_tx = web3.thk.signTransaction(con_tx, privarte_key)
     contracthash = web3.thk.sendRawTx(con_sign_tx)
     # 获取合约hash
     time.sleep(5)
@@ -30,25 +30,25 @@ def Transfer():
     return conresp['contractAddress']
 
 
-def ReleaseContract(contractName, contractText):
-    accountInfo = web3.thk.getAccount(address)
-    contractresp = web3.thk.compileContract("2", contractText)
+def ReleaseContract(contractName, contract_text):
+    account_info = web3.thk.getAccount(address)
+    contractresp = web3.thk.compileContract("2", contract_text)
     code = contractresp[contractName]["code"]
     # 发布合约
     con_tx = {
         "chainId": "2",
         "from": address,
-        "nonce": str(accountInfo["nonce"]),
+        "nonce": str(account_info["nonce"]),
         "to": "",
         "input": code,
         "value": "0"
     }
-    privartekey = get_privatekey()
-    con_sign_tx = web3.thk.signTransaction(con_tx, privartekey)
-    contracthash = web3.thk.sendRawTx(con_sign_tx)
+    privarte_key = get_privatekey()
+    con_signtx = web3.thk.signTransaction(con_tx, privarte_key)
+    contract_hash = web3.thk.sendRawTx(con_signtx)
     # 获取合约hash
     time.sleep(5)
-    conresp = web3.thk.getTransactionByHash("2", contracthash["TXhash"])
+    conresp = web3.thk.getTransactionByHash("2", contract_hash["TXhash"])
     contract_address = conresp['contractAddress']
     web3.thk.saveContract(contract_address, contractresp)
     return contract_address
@@ -72,8 +72,6 @@ def get_privatekey():
         encrypted_keyobj = json.loads(encrypted_key)
         print("encrypted_keyobj", encrypted_keyobj)
         private_key = web3.eth.account.decrypt(encrypted_keyobj, '123456')
-
-        # print("encrypted_address", w3.eth.account.privateKeyToAccount(private_key).address())
 
     return private_key
 
