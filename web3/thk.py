@@ -16,9 +16,6 @@ from eth_utils import (
     keccak as eth_utils_keccak,
     is_string,
 )
-from hexbytes import (
-    HexBytes,
-)
 
 from web3._utils.decorators import (
     deprecated_for,
@@ -161,7 +158,7 @@ class Thk(Module):
             }
         )
 
-    def getTransactionByHash(self, chainId, hash):
+    def getTxByHash(self, chainId, hash):
         return self.web3.manager.request_blocking(
             "GetTransactionByHash",
             {
@@ -274,5 +271,3 @@ class Thk(Module):
             return ContractFactory(address)
         else:
             return ContractFactory
-
-
