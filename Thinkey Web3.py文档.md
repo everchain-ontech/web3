@@ -10,7 +10,7 @@
 ```
 
 <a name="19717266"></a>
-### web3.thk.GetAccount(获取账户余额)
+### web3.thk.getAccount(获取账户余额)
 请求参数:
 
 | 参数名 |  类型 |  是否必须 |  含义 |
@@ -36,7 +36,7 @@ response = web3.thk.getAccount('0x0000000000000000000000000000000000000000')
 response:
 {
    "address": "0x0000000000000000000000000000000000000000",
-   "nonce": 0, //
+   "nonce": 0, 
    "balance": 0,
    "storageRoot": null,
    "codeHash": null
@@ -118,7 +118,7 @@ Transaction:
 
 | **参数名称** | **参数类型** | **是否必须** | **含义** |
 | :---: | :---: | :---: | :---: |
-| chainid | string | true | 链id |
+| chainID | string | true | 链id |
 | from | string | true | 交易发起账户地址 |
 | to | string | true | 交易接受账户地址 |
 | nonce | string | true | 交易的发起者在之前进行过的交易数量 |
@@ -246,18 +246,27 @@ response:
       }
 ]
 ```
-<a name="web3.thk.callTransaction"></a>
-### web3.thk.callTransaction
+<a name="web3.thk.callRawTx"></a>
+### web3.thk.callRawTx
 请求参数:
+
+| **参数名称** | **参数类型** | **是否必须** | **含义** |
+| :---: | :---: | :---: | :---: |
+| transaction | dict | true | 交易对象 |
+
+transaction:
 
 | **参数名称** | **参数类型** | **是否必须** | **含义** |
 | :---: | :---: | :---: | :---: |
 | chainId | string | true | 链id |
 | from | string | true | 交易发起账户地址 |
 | to | string | true | 交易接受账户地址 |
-| nonce | int | true | 交易的发起者在之前进行过的交易数量 |
-| value | int | true | 转账金额 |
+| nonce | string | true | 交易的发起者在之前进行过的交易数量 |
+| value | string | true | 转账金额 |
 | input | string | true | 调用合约时的参数 |
+| sig | string | true | 交易签名 |
+| pub | string | true | 公钥 |
+
 
 响应参数:
 
@@ -275,7 +284,7 @@ Transaction:
 
 | **参数名称** | **参数类型** | **是否必须** | **含义** |
 | :---: | :---: | :---: | :---: |
-| chainid | string | true | 链id |
+| chainID | string | true | 链id |
 | from | string | true | 交易发起账户地址 |
 | to | string | true | 交易接受账户地址 |
 | nonce | string | true | 交易的发起者在之前进行过的交易数量 |

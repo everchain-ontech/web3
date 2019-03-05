@@ -116,18 +116,18 @@ class Thk(Module):
         new_transaction = merge(current_transaction_params, transaction_params)
         return replace_transaction(self.web3, current_transaction, new_transaction)
 
-    def sendTx(self, chainId, fromAddr, toAddr, nonce, value, input):
-        return self.web3.manager.request_blocking(
-            "SendTx",
-            {
-                "chainId": chainId,
-                "from": fromAddr,
-                "to": toAddr,
-                "nonce": nonce,
-                "value": value,
-                "input": input
-            }
-        )
+    # def sendTx(self, chainId, fromAddr, toAddr, nonce, value, input):
+    #     return self.web3.manager.request_blocking(
+    #         "SendTx",
+    #         {
+    #             "chainId": chainId,
+    #             "from": fromAddr,
+    #             "to": toAddr,
+    #             "nonce": nonce,
+    #             "value": value,
+    #             "input": input
+    #         }
+    #     )
 
     def getBlockTxs(self, chainId, height, page, size):
         return self.web3.manager.request_blocking(
@@ -167,17 +167,22 @@ class Thk(Module):
             }
         )
 
-    def callTransaction(self, chainId, fromAddr, toAddr, nonce, value, input):
+    # def callTransaction(self, chainId, fromAddr, toAddr, nonce, value, input):
+    #     return self.web3.manager.request_blocking(
+    #         "CallTransaction",
+    #         {
+    #             "chainId": chainId,
+    #             "from": fromAddr,
+    #             "to": toAddr,
+    #             "nonce": nonce,
+    #             "value": value,
+    #             "input": input
+    #         }
+    #     )
+
+    def callRawTx(self, transaction):
         return self.web3.manager.request_blocking(
-            "CallTransaction",
-            {
-                "chainId": chainId,
-                "from": fromAddr,
-                "to": toAddr,
-                "nonce": nonce,
-                "value": value,
-                "input": input
-            }
+            "CallTransaction", transaction
         )
 
     def getBlockHeader(self, chainId, height):
@@ -206,6 +211,7 @@ class Thk(Module):
         )
 
     def sendRawTx(self, transaction):
+        print(transaction)
         return self.web3.manager.request_blocking(
             "SendTx", transaction
         )

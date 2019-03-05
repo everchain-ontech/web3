@@ -18,6 +18,7 @@ def Transfer():
         "value": "1111111110"
     }
     privarte_key = get_privatekey()
+    print("privarte_key:" + str(privarte_key))
     con_sign_tx = web3.thk.signTransaction(con_tx, privarte_key)
     contracthash = web3.thk.sendRawTx(con_sign_tx)
     # 获取合约hash
@@ -40,13 +41,14 @@ def ReleaseContract(contractName, contract_text):
         "value": "0"
     }
     privarte_key = get_privatekey()
+    print(privarte_key)
     con_signtx = web3.thk.signTransaction(con_tx, privarte_key)
     contract_hash = web3.thk.sendRawTx(con_signtx)
     # 获取合约hash
     time.sleep(5)
-    conresp = web3.thk.getTransactionByHash("2", contract_hash["TXhash"])
+    conresp = web3.thk.getTxByHash("2", contract_hash["TXhash"])
     contract_address = conresp['contractAddress']
-    web3.thk.saveContract(contract_address, contractresp)
+    res = web3.thk.saveContract(contract_address, contractresp)
     return contract_address
 
 
@@ -82,18 +84,19 @@ if __name__ == "__main__":
                                                                         "public { storedData = x;} function get() " \
                                                                         "public view returns (uint) { return " \
                                                                         "storedData;}} "
-    Transfer()
+
+    # Transfer()
     thk = web3.thk
     contractAddress = ReleaseContract(cotractName, contractText)
     print(contractAddress)
     getcontract = thk.getContract(contractAddress)
     mycon = thk.contract(address=contractAddress, abi=getcontract[cotractName]["info"]["abiDefinition"])
-    accountInfo = thk.getAccount(address)
+    account_info = thk.getAccount(address)
 
     txn = mycon.functions.set(2).buildTx({
         "chainId": "2",
         "from": address,
-        "nonce": str(accountInfo["nonce"])
+        "nonce": str(account_info["nonce"])
     })
     print(txn)
     privartekey = get_privatekey()
@@ -101,13 +104,14 @@ if __name__ == "__main__":
     contracthash = thk.sendRawTx(con_sign_tx)
 
     time.sleep(5)
-    accountInfo = thk.getAccount(address)
+    account_info = thk.getAccount(address)
     gettxn = mycon.functions.get().buildTx({
         "chainId": "2",
         "from": address,
-        "nonce": str(accountInfo["nonce"])
+        "nonce": str(account_info["nonce"])
     })
     privartekey = get_privatekey()
     con_sign_tx = thk.signTransaction(gettxn, privartekey)
-    contracthash = thk.sendRawTx(con_sign_tx)
-    print(accountInfo)
+    result = thk.callRawTx(con_sign_tx)
+
+    print(result)
