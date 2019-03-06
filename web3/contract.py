@@ -543,7 +543,11 @@ class ContractConstructor:
     @combomethod
     def transact(self, transaction=None):
         if transaction is None:
-            transact_transaction = {"to": ""}
+            transact_transaction = {
+                "to": "", "from": self.web3.thk.defaultAddress,
+                "value": "0", "chainId": "2"
+
+            }
         else:
             transact_transaction = dict(**transaction)
             self.check_forbidden_keys_in_transaction(transact_transaction,
@@ -551,9 +555,6 @@ class ContractConstructor:
 
         # if self.web3.eth.defaultAccount is not empty:
         #     transact_transaction.setdefault('from', self.web3.eth.defaultAccount)
-        transact_transaction["from"] = self.web3.thk.defaultAddress
-        transact_transaction['value'] = '0'
-        transact_transaction['chainId'] = '2'
         transact_transaction['input'] = self.data_in_transaction
         account_info = self.web3.thk.getAccount(self.web3.thk.defaultAddress)
         transact_transaction['nonce'] = str(account_info["nonce"])
