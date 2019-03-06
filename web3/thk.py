@@ -228,12 +228,13 @@ class Thk(Module):
     def signTransaction(self, transaction_dict, private_key):
         if not isinstance(transaction_dict, Mapping):
             raise TypeError("transaction_dict must be dict-like, got %r" % transaction_dict)
-        sign_str = transaction_dict["chainId"] + remove_0x_prefix(transaction_dict["from"]) + \
-                   remove_0x_prefix(transaction_dict["to"]) + transaction_dict["nonce"] + \
-                   transaction_dict["value"] + remove_0x_prefix(transaction_dict["input"])
+        sign_str = transaction_dict["chainId"] + remove_0x_prefix(transaction_dict["from"].lower()) + \
+                   remove_0x_prefix(transaction_dict["to"].lower()) + transaction_dict["nonce"] + \
+                   transaction_dict["value"] + remove_0x_prefix(transaction_dict["input"].lower())
         sign_bytes = to_bytes(text=sign_str)
         res = eth_utils_keccak(sign_bytes)
         sign_hash = self.account.signHash(to_hex(res), private_key=private_key)
+        print(sign_hash)
         transaction_dict["sig"] = to_hex(sign_hash.signature)
         pk = keys.PrivateKey(private_key)
         transaction_dict["pub"] = "0x04" + pk.public_key.to_hex()[2:]
