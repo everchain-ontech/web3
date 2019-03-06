@@ -3,6 +3,10 @@ import time
 
 from web3 import Web3, HTTPProvider
 
+from web3._utils.encoding import (
+    remove_0x_prefix
+)
+
 address = "0x2c7536e3605d9c16a7a3d7b1898e529396a65c23"
 
 
@@ -79,39 +83,72 @@ if __name__ == "__main__":
     provider = HTTPProvider(FULL_NODE_HOSTS)
     web3 = Web3(provider)
 
-    cotractName = "SimpleStorage"
-    contractText = "pragma solidity >= 0.4.0;contract " + cotractName + "{uint storedData; function set(uint x) " \
-                                                                        "public { storedData = x;} function get() " \
-                                                                        "public view returns (uint) { return " \
-                                                                        "storedData;}} "
+    cotractName = "Greeter"
+    contractText = '''
+    pragma solidity >=0.4.21;
 
-    # Transfer()
-    thk = web3.thk
+contract Greeter {
+    string public greeting;
+
+    constructor() public  {
+        greeting = 'Hello';
+    }
+
+    function setGreeting(string memory _greeting) public  {
+        greeting = _greeting;
+    }
+
+    function greet() view public  returns ( string memory)  {
+        return greeting;
+    }
+}
+    '''
+    privartekey = get_privatekey()
+    # 初始化私钥
+    web3.thk.defaultPrivateKey = privartekey
+
+    # 初始化账户地址
+    web3.thk.defaultAddress = address
+    # 测试发送一笔交易
+    Transfer()
+
+    # 测试发布合约
     contractAddress = ReleaseContract(cotractName, contractText)
     print(contractAddress)
-    getcontract = thk.getContract(contractAddress)
-    mycon = thk.contract(address=contractAddress, abi=getcontract[cotractName]["info"]["abiDefinition"])
-    account_info = thk.getAccount(address)
+    getcontract = web3.thk.getContract(contractAddress)
+    abi = getcontract[cotractName]["info"]["abiDefinition"]
+    contract_bin = remove_0x_prefix(getcontract[cotractName]["code"])
+    Greeter = web3.thk.contract(abi=abi, bytecode=contract_bin)
 
-    txn = mycon.functions.set(2).buildTx({
+    # 构造函数
+    tx_hash = Greeter.constructor().transact()
+    # 等待交易执行完成
+    tx_receipt = web3.thk.waitForTransactionReceipt("2", tx_hash["TXhash"])
+
+    # 初始化合约对象
+    greeter = web3.thk.contract(
+        address=tx_receipt['contractAddress'],
+        abi=abi,
+    )
+
+    account_info = web3.thk.getAccount(address)
+    # 执行合约内函数
+    txn = greeter.functions.setGreeting("asd").buildTx({
         "chainId": "2",
         "from": address,
         "nonce": str(account_info["nonce"])
     })
-    print(txn)
-    privartekey = get_privatekey()
-    con_sign_tx = thk.signTransaction(txn, privartekey)
-    contracthash = thk.sendRawTx(con_sign_tx)
-
+    con_sign_tx = web3.thk.signTransaction(txn, web3.thk.defaultPrivateKey)
+    contracthash = web3.thk.sendRawTx(con_sign_tx)
     time.sleep(5)
-    account_info = thk.getAccount(address)
-    gettxn = mycon.functions.get().buildTx({
+    account_info = web3.thk.getAccount(address)
+
+    gettxn = greeter.functions.greet().buildTx({
         "chainId": "2",
         "from": address,
         "nonce": str(account_info["nonce"])
     })
-    privartekey = get_privatekey()
-    con_sign_tx = thk.signTransaction(gettxn, privartekey)
-    result = thk.callRawTx(con_sign_tx)
+    con_sign_tx = web3.thk.signTransaction(gettxn, web3.thk.defaultPrivateKey)
+    result = web3.thk.callRawTx(con_sign_tx)
 
     print(result)

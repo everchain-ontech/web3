@@ -2,12 +2,20 @@ from eth_account import (
     Account,
 )
 
+from web3._utils.threads import (
+    Timeout,
+)
+
 from collections import (
     Mapping,
 )
 
 from eth_keys import (
     keys
+)
+
+from web3.exceptions import (
+    TimeExhausted,
 )
 
 from eth_utils import (
@@ -63,6 +71,8 @@ class Thk(Module):
     account = Account()
     defaultAccount = empty
     defaultBlock = "latest"
+    defaultPrivateKey = None
+    defaultAddress = None
     defaultContractFactory = Contract
     iban = Iban
     gasPriceStrategy = None
@@ -211,7 +221,6 @@ class Thk(Module):
         )
 
     def sendRawTx(self, transaction):
-        print(transaction)
         return self.web3.manager.request_blocking(
             "SendTx", transaction
         )
@@ -224,7 +233,6 @@ class Thk(Module):
                    transaction_dict["value"] + remove_0x_prefix(transaction_dict["input"])
         sign_bytes = to_bytes(text=sign_str)
         res = eth_utils_keccak(sign_bytes)
-        print(to_hex(res))
         sign_hash = self.account.signHash(to_hex(res), private_key=private_key)
         transaction_dict["sig"] = to_hex(sign_hash.signature)
         pk = keys.PrivateKey(private_key)
@@ -277,3 +285,14 @@ class Thk(Module):
             return ContractFactory(address)
         else:
             return ContractFactory
+
+    def waitForTransactionReceipt(self, chainId, transaction_hash, timeout=5):
+        try:
+            return wait_for_transaction_receipt(self.web3, chainId, transaction_hash, timeout)
+        except Timeout:
+            raise TimeExhausted(
+                "Transaction {} is not in the chain, after {} seconds".format(
+                    transaction_hash,
+                    timeout,
+                )
+            )

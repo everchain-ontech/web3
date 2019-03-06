@@ -489,6 +489,7 @@ def mk_collision_prop(fn_name):
     def collision_fn():
         msg = "Namespace collision for function name {0} with ConciseContract API.".format(fn_name)
         raise AttributeError(msg)
+
     collision_fn.__name__ = fn_name
     return collision_fn
 
@@ -497,6 +498,7 @@ class ContractConstructor:
     """
     Class for contract constructor API.
     """
+
     def __init__(self, web3, abi, bytecode, *args, **kwargs):
         self.web3 = web3
         self.abi = abi
@@ -541,19 +543,23 @@ class ContractConstructor:
     @combomethod
     def transact(self, transaction=None):
         if transaction is None:
-            transact_transaction = {}
+            transact_transaction = {"to": ""}
         else:
             transact_transaction = dict(**transaction)
             self.check_forbidden_keys_in_transaction(transact_transaction,
                                                      ["data", "to"])
 
-        if self.web3.eth.defaultAccount is not empty:
-            transact_transaction.setdefault('from', self.web3.eth.defaultAccount)
-
-        transact_transaction['data'] = self.data_in_transaction
-
-        # TODO: handle asynchronous contract creation
-        return self.web3.eth.sendTransaction(transact_transaction)
+        # if self.web3.eth.defaultAccount is not empty:
+        #     transact_transaction.setdefault('from', self.web3.eth.defaultAccount)
+        transact_transaction["from"] = self.web3.thk.defaultAddress
+        transact_transaction['value'] = '0'
+        transact_transaction['chainId'] = '2'
+        transact_transaction['input'] = self.data_in_transaction
+        account_info = self.web3.thk.getAccount(self.web3.thk.defaultAddress)
+        transact_transaction['nonce'] = str(account_info["nonce"])
+        con_sign_tx = self.web3.thk.signTransaction(transact_transaction, self.web3.thk.defaultPrivateKey)
+        res = self.web3.thk.sendRawTx(con_sign_tx)
+        return res
 
     @combomethod
     def buildTransaction(self, transaction=None):
@@ -619,6 +625,7 @@ class ConciseContract:
 
     > contract.functions.withdraw(amount).transact({'from': eth.accounts[1], 'gas': 100000, ...})
     """
+
     @deprecated_for(
         "contract.caller.<method name> or contract.caller({transaction_dict}).<method name>"
     )
@@ -698,6 +705,7 @@ class ImplicitContract(ConciseContract):
 
     > contract.functions.withdraw(amount).transact({})
     """
+
     def __init__(self, classic_contract, method_class=ImplicitMethod):
         super().__init__(classic_contract, method_class=method_class)
 
@@ -938,7 +946,6 @@ class ContractFunction:
             **self.kwargs
         )
 
-
     def buildTx(self, transaction=None):
         """
                 Build the transaction dictionary without sending
@@ -978,7 +985,6 @@ class ContractFunction:
             **self.kwargs
         )
         return result
-
 
     @combomethod
     def _encode_transaction_data(cls):
@@ -1218,6 +1224,7 @@ class ContractCaller:
 
     > contract.caller(transaction={'from': eth.accounts[1], 'gas': 100000, ...}).add(2, 3)
     """
+
     def __init__(self,
                  abi,
                  web3,
@@ -1345,8 +1352,8 @@ def call_contract_function(
         # Provide a more helpful error message than the one provided by
         # eth-abi-utils
         is_missing_code_error = (
-            return_data in ACCEPTABLE_EMPTY_STRINGS and
-            web3.eth.getCode(address) in ACCEPTABLE_EMPTY_STRINGS
+                return_data in ACCEPTABLE_EMPTY_STRINGS and
+                web3.eth.getCode(address) in ACCEPTABLE_EMPTY_STRINGS
         )
         if is_missing_code_error:
             msg = (
