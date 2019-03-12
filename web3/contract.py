@@ -3,13 +3,18 @@
 """
 import copy
 import itertools
-
+from hexbytes import HexBytes
 from eth_abi import (
     decode_abi,
 )
 from eth_abi.exceptions import (
     DecodingError,
 )
+
+from web3._utils.encoding import (
+    remove_0x_prefix
+)
+
 from eth_utils import (
     add_0x_prefix,
     encode_hex,
@@ -795,17 +800,24 @@ class ContractFunction:
             and variables exposed as Python methods
         """
         if transaction is None:
-            call_transaction = {}
+            call_transaction = {"chainId": "2"}
         else:
             call_transaction = dict(**transaction)
 
-        if 'data' in call_transaction:
-            raise ValueError("Cannot set data in call transaction")
+        if 'input' in call_transaction:
+            raise ValueError("Cannot set input in call transaction")
 
         if self.address:
             call_transaction.setdefault('to', self.address)
-        if self.web3.eth.defaultAccount is not empty:
-            call_transaction.setdefault('from', self.web3.eth.defaultAccount)
+        if self.web3.thk.defaultAddress is not empty:
+            call_transaction.setdefault('from', self.web3.thk.defaultAddress)
+
+        if 'nonce' not in call_transaction:
+            accountInfo = self.web3.thk.getAccount(self.web3.thk.defaultAddress)
+            if isinstance(accountInfo, dict) and "nonce" in accountInfo:
+                call_transaction.setdefault("nonce", accountInfo["nonce"])
+            else:
+                raise ValueError("Get address nonce failed", accountInfo)
 
         if 'to' not in call_transaction:
             if isinstance(self, type):
@@ -1337,10 +1349,8 @@ def call_contract_function(
         fn_kwargs=kwargs,
     )
 
-    if block_id is None:
-        return_data = web3.eth.call(call_transaction)
-    else:
-        return_data = web3.eth.call(call_transaction, block_identifier=block_id)
+    call_transaction.setdefault("value", "0")
+    return_data = web3.thk.callRawTx(call_transaction)
 
     if fn_abi is None:
         fn_abi = find_matching_fn_abi(contract_abi, function_identifier, args, kwargs)
@@ -1348,7 +1358,7 @@ def call_contract_function(
     output_types = get_abi_output_types(fn_abi)
 
     try:
-        output_data = decode_abi(output_types, return_data)
+        output_data = decode_abi(output_types, HexBytes(return_data['out']))
     except DecodingError as e:
         # Provide a more helpful error message than the one provided by
         # eth-abi-utils

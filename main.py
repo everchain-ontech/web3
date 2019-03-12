@@ -143,12 +143,14 @@ contract Greeter {
     time.sleep(5)
     account_info = web3.thk.getAccount(address)
 
-    gettxn = greeter.functions.greet().buildTx({
-        "chainId": "2",
-        "from": address,
-        "nonce": str(account_info["nonce"])
-    })
-    con_sign_tx = web3.thk.signTransaction(gettxn, web3.thk.defaultPrivateKey)
-    result = web3.thk.callRawTx(con_sign_tx)
+    gettxn = greeter.functions.greet().call()
+    # gettxn = greeter.functions.greet().buildTx({
+    #     "chainId": "2",
+    #     "from": address,
+    #     "nonce": str(account_info["nonce"])
+    # })
 
-    print(result)
+    # con_sign_tx = web3.thk.signTransaction(gettxn, web3.thk.defaultPrivateKey)
+    # result = web3.thk.callRawTx(con_sign_tx)
+
+    print(gettxn)
