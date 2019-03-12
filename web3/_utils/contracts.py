@@ -184,7 +184,7 @@ def prepare_transaction(
         prepared_transaction = dict(**transaction)
 
     if 'input' in prepared_transaction:
-        raise ValueError("Transaction parameter may not contain a 'data' key")
+        raise ValueError("Transaction parameter may not contain a 'input' key")
 
     if address:
         prepared_transaction.setdefault('to', address)
