@@ -278,7 +278,8 @@ class Contract:
             )
 
         if address:
-            self.address = normalize_address(self.web3.ens, address)
+            #self.address = normalize_address(self.web3.ens, address)
+            self.address = address
 
         if not self.address:
             raise TypeError("The address argument is required to instantiate a contract.")
