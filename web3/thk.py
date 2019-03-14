@@ -73,6 +73,7 @@ class Thk(Module):
     defaultBlock = "latest"
     defaultPrivateKey = None
     defaultAddress = None
+    defaultChainId = "2"
     defaultContractFactory = Contract
     iban = Iban
     gasPriceStrategy = None
@@ -93,7 +94,7 @@ class Thk(Module):
         return self.web3.manager.request_blocking(
             "GetAccount",
             {
-                "chainId": "1",
+                "chainId": self.defaultChainId,
                 "address": account
             }
         )
@@ -158,10 +159,11 @@ class Thk(Module):
             }
         )
 
-    def getTransactions(self, address, startHeight, endHeight):
+    def getTransactions(self, chainId,address, startHeight, endHeight):
         return self.web3.manager.request_blocking(
             "GetTransactions",
             {
+                "chainId": chainId,
                 "address": address,
                 "startHeight": startHeight,
                 "endHeight": endHeight
@@ -234,7 +236,7 @@ class Thk(Module):
         sign_bytes = to_bytes(text=sign_str)
         res = eth_utils_keccak(sign_bytes)
         sign_hash = self.account.signHash(to_hex(res), private_key=private_key)
-        print(sign_hash)
+        print("sign_hash=",sign_hash)
         transaction_dict["sig"] = to_hex(sign_hash.signature)
         pk = keys.PrivateKey(private_key)
         transaction_dict["pub"] = "0x04" + pk.public_key.to_hex()[2:]
