@@ -29,9 +29,13 @@ def Transfer():
 
     print("con_sign_tx:" + str(con_sign_tx))
     contracthash = web3.thk.sendRawTx(con_sign_tx)
+
+    print("Transfer contracthash :",contracthash)
     # 获取合约hash
     time.sleep(5)
     conresp = web3.thk.getTxByHash(web3.thk.defaultChainId, contracthash["TXhash"])
+
+    print("Transfer conresp :",conresp)
     return conresp['contractAddress']
 
 
@@ -90,7 +94,7 @@ def get_privatekey():
 
 
 if __name__ == "__main__":
-    FULL_NODE_HOSTS = 'http://thinkey.natapp1.cc/http2rpc'
+    FULL_NODE_HOSTS = 'http://http2rpc.thinkey.org'
     #FULL_NODE_HOSTS = 'http://192.168.1.126:8089/http2rpc'
     provider = HTTPProvider(FULL_NODE_HOSTS)
     web3 = Web3(provider)
