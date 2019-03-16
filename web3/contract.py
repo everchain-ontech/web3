@@ -278,7 +278,8 @@ class Contract:
             )
 
         if address:
-            self.address = normalize_address(self.web3.ens, address)
+            #self.address = normalize_address(self.web3.ens, address)
+            self.address = address
 
         if not self.address:
             raise TypeError("The address argument is required to instantiate a contract.")
@@ -550,7 +551,9 @@ class ContractConstructor:
         if transaction is None:
             transact_transaction = {
                 "to": "", "from": self.web3.thk.defaultAddress,
-                "value": "0", "chainId": "2"
+                "value": "0",  "chainId": self.web3.thk.defaultChainId,
+                "fromChainId": self.web3.thk.defaultChainId,
+                "toChainId": self.web3.thk.defaultChainId
 
             }
         else:
@@ -800,7 +803,9 @@ class ContractFunction:
             and variables exposed as Python methods
         """
         if transaction is None:
-            call_transaction = {"chainId": "2"}
+            call_transaction = {"chainId": self.web3.thk.defaultChainId,
+                "fromChainId": self.web3.thk.defaultChainId,
+                "toChainId": self.web3.thk.defaultChainId}
         else:
             call_transaction = dict(**transaction)
 
