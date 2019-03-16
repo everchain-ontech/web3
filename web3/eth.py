@@ -100,11 +100,11 @@ class Eth(Module):
 
     @property
     def accounts(self):
-        return self.web3.manager.request_blocking("eth_accounts", [])
+        return self.web3.manager.request_blocking("eth_accounts", [])["result"]
 
     @property
     def blockNumber(self):
-        return self.web3.manager.request_blocking("eth_blockNumber", [])
+        return self.web3.manager.request_blocking("eth_blockNumber", [])["result"]
 
     def getBalance(self, account, block_identifier=None):
         if block_identifier is None:
@@ -145,7 +145,7 @@ class Eth(Module):
         return self.web3.manager.request_blocking(
             method,
             [block_identifier, full_transactions],
-        )
+        )["result"]
 
     def getBlockTransactionCount(self, block_identifier):
         """
@@ -240,7 +240,7 @@ class Eth(Module):
         return self.web3.manager.request_blocking(
             "eth_getTransactionReceipt",
             [transaction_hash],
-        )
+        )["result"]
 
     def getTransactionCount(self, account, block_identifier=None):
         if block_identifier is None:
@@ -274,13 +274,13 @@ class Eth(Module):
             transaction = assoc(
                 transaction,
                 'gas',
-                get_buffered_gas_estimate(self.web3, transaction),
+                3138524,#get_buffered_gas_estimate(self.web3, transaction),
             )
 
         return self.web3.manager.request_blocking(
             "eth_sendTransaction",
             [transaction],
-        )
+        )["result"]
 
     def sendRawTransaction(self, raw_transaction):
         return self.web3.manager.request_blocking(
@@ -303,10 +303,13 @@ class Eth(Module):
         # TODO: move to middleware
         if block_identifier is None:
             block_identifier = self.defaultBlock
-        return self.web3.manager.request_blocking(
+        result = self.web3.manager.request_blocking(
             "eth_call",
             [transaction, block_identifier],
         )
+        print("eth_call", result)
+
+        return result
 
     def estimateGas(self, transaction, block_identifier=None):
         # TODO: move to middleware
@@ -321,7 +324,7 @@ class Eth(Module):
         return self.web3.manager.request_blocking(
             "eth_estimateGas",
             params,
-        )
+        )["result"]
 
     def filter(self, filter_params=None, filter_id=None):
         if filter_id and filter_params:
@@ -401,7 +404,7 @@ class Eth(Module):
 
     def generateGasPrice(self, transaction_params=None):
         if self.gasPriceStrategy:
-            return self.gasPriceStrategy(self.web3, transaction_params)
+            return 2#self.gasPriceStrategy(self.web3, transaction_params)
 
     def setGasPriceStrategy(self, gas_price_strategy):
         self.gasPriceStrategy = gas_price_strategy

@@ -79,7 +79,7 @@ def get_privatekey():
 
 
 if __name__ == "__main__":
-    FULL_NODE_HOSTS = 'http://thinkey.natapp1.cc/http2rpc'
+    FULL_NODE_HOSTS = 'http://http2rpc.thinkey.org'
     provider = HTTPProvider(FULL_NODE_HOSTS)
     web3 = Web3(provider)
 
