@@ -14,7 +14,9 @@ def Transfer():
     """转账"""
     account_info = web3.thk.getAccount(address)
     con_tx = {
-        "chainId": "2",
+        "chainId": web3.thk.defaultChainId,
+        "fromChainId": web3.thk.defaultChainId,
+        "toChainId": web3.thk.defaultChainId,
         "from": address,
         "nonce": str(account_info["nonce"]),
         "to": "0x0000000000000000000000000000000000000000",
@@ -24,20 +26,24 @@ def Transfer():
     privarte_key = get_privatekey()
     print("privarte_key:" + str(privarte_key))
     con_sign_tx = web3.thk.signTransaction(con_tx, privarte_key)
+
+    print("con_sign_tx:" + str(con_sign_tx))
     contracthash = web3.thk.sendRawTx(con_sign_tx)
     # 获取合约hash
     time.sleep(5)
-    conresp = web3.thk.getTxByHash("2", contracthash["TXhash"])
+    conresp = web3.thk.getTxByHash(web3.thk.defaultChainId, contracthash["TXhash"])
     return conresp['contractAddress']
 
 
 def ReleaseContract(contractName, contract_text):
     account_info = web3.thk.getAccount(address)
-    contractresp = web3.thk.compileContract("2", contract_text)
+    contractresp = web3.thk.compileContract(web3.thk.defaultChainId, contract_text)
     code = contractresp[contractName]["code"]
     # 发布合约
     con_tx = {
-        "chainId": "2",
+        "chainId": web3.thk.defaultChainId,
+        "fromChainId": web3.thk.defaultChainId,
+        "toChainId": web3.thk.defaultChainId,
         "from": address,
         "nonce": str(account_info["nonce"]),
         "to": "",
@@ -47,10 +53,14 @@ def ReleaseContract(contractName, contract_text):
     privarte_key = get_privatekey()
     print(privarte_key)
     con_signtx = web3.thk.signTransaction(con_tx, privarte_key)
+
+    print("con_signtx=", con_signtx)
+
     contract_hash = web3.thk.sendRawTx(con_signtx)
+
     # 获取合约hash
     time.sleep(5)
-    conresp = web3.thk.getTxByHash("2", contract_hash["TXhash"])
+    conresp = web3.thk.getTxByHash(web3.thk.defaultChainId, contract_hash["TXhash"])
     contract_address = conresp['contractAddress']
     res = web3.thk.saveContract(contract_address, contractresp)
     return contract_address
@@ -79,7 +89,7 @@ def get_privatekey():
 
 
 if __name__ == "__main__":
-    FULL_NODE_HOSTS = 'http://http2rpc.thinkey.org'
+    FULL_NODE_HOSTS = 'http://thinkey.natapp1.cc'
     provider = HTTPProvider(FULL_NODE_HOSTS)
     web3 = Web3(provider)
 
@@ -109,21 +119,33 @@ contract Greeter {
 
     # 初始化账户地址
     web3.thk.defaultAddress = address
+    # 初始化默认chainId
+    web3.thk.defaultChainId = "2"
+
     # 测试发送一笔交易
     Transfer()
 
     # 测试发布合约
-    contractAddress = ReleaseContract(cotractName, contractText)
-    print(contractAddress)
-    getcontract = web3.thk.getContract(contractAddress)
+    # contractAddress = ReleaseContract(cotractName, contractText)
+    # print(contractAddress)
+    # getcontract = web3.thk.getContract(contractAddress)
+
+    getcontract = web3.thk.compileContract(web3.thk.defaultChainId, contractText)
+
     abi = getcontract[cotractName]["info"]["abiDefinition"]
     contract_bin = remove_0x_prefix(getcontract[cotractName]["code"])
     Greeter = web3.thk.contract(abi=abi, bytecode=contract_bin)
 
     # 构造函数
     tx_hash = Greeter.constructor().transact()
+    print("tx_hash=", tx_hash)
     # 等待交易执行完成
-    tx_receipt = web3.thk.waitForTransactionReceipt("2", tx_hash["TXhash"])
+    tx_receipt = web3.thk.waitForTransactionReceipt(web3.thk.defaultChainId, tx_hash["TXhash"])
+    if tx_receipt["status"] == 1:
+        print("合约:", cotractName, "发布成功")
+    else:
+        print("合约:", cotractName, "发布失败")
+    print("contractAddress=", tx_receipt['contractAddress'])
 
     # 初始化合约对象
     greeter = web3.thk.contract(
@@ -134,7 +156,9 @@ contract Greeter {
     account_info = web3.thk.getAccount(address)
     # 执行合约内函数
     txn = greeter.functions.setGreeting("asd").buildTx({
-        "chainId": "2",
+        "chainId": web3.thk.defaultChainId,
+        "fromChainId": web3.thk.defaultChainId,
+        "toChainId": web3.thk.defaultChainId,
         "from": address,
         "nonce": str(account_info["nonce"])
     })
