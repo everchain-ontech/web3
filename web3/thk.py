@@ -289,7 +289,7 @@ class Thk(Module):
         else:
             return ContractFactory
 
-    def waitForTransactionReceipt(self, chainId, transaction_hash, timeout=5):
+    def waitForTransactionReceipt(self, chainId, transaction_hash, timeout=5000):
         try:
             return wait_for_transaction_receipt(self.web3, chainId, transaction_hash, timeout)
         except Timeout:
