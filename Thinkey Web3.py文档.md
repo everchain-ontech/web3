@@ -9,7 +9,7 @@
  thk = web3.thk
 ```
 
-<a name="19717266"></a>
+<a name="46fe1e95"></a>
 ### web3.thk.getAccount(获取账户余额)
 请求参数:
 
@@ -57,6 +57,8 @@ transaction:
 | **参数名称** | **参数类型** | **是否必须** | **含义** |
 | :---: | :---: | :---: | :---: |
 | chainId | string | true | 链id |
+| fromChainId | string | true | from地址的链id |
+| toChainId | string | true | to地址的链id |
 | from | string | true | 交易发起账户地址 |
 | to | string | true | 交易接受账户地址 |
 | nonce | string | true | 交易的发起者在之前进行过的交易数量 |
@@ -74,7 +76,9 @@ transaction:
 示例:
 ```python
 transaction = (
-  "chainId": "2",
+    	"chainId": "2",
+       "fromChainId": "2",
+  			"toChainId": "2",
         "from": "0x2c7536e3605d9c16a7a3d7b1898e529396a65c23",
         "nonce": "1",
         "to": "0x0000000000000000000000000000000000000000",
@@ -202,6 +206,7 @@ response
 
 | **参数名称** | **参数类型** | **是否必须** | **含义** |
 | :---: | :---: | :---: | :---: |
+| address | string | true | 账户地址 |
 | chainId | string | true | 链id |
 | startHeight | string | true | 查询的起始块高 |
 | endHeight | string | true | 查询的截止块高 |
@@ -259,6 +264,8 @@ transaction:
 | **参数名称** | **参数类型** | **是否必须** | **含义** |
 | :---: | :---: | :---: | :---: |
 | chainId | string | true | 链id |
+| fromChainId | string | true | from地址的链id |
+| toChainId | string | true | to地址的链id |
 | from | string | true | 交易发起账户地址 |
 | to | string | true | 交易接受账户地址 |
 | nonce | string | true | 交易的发起者在之前进行过的交易数量 |
